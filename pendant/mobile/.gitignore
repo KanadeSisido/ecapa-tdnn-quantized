@@ -6,3 +6,4 @@ local.properties
 xcuserdata/
 interop/.build/
 iosApp/Sources/Secrets.plist
+demo/out/

@@ -1,0 +1,66 @@
+# anam（pendant/mobile の Android アプリ）の全画面ツアー。record.sh から実行する。
+# 文言は ProductUi.kt / MainActivity.kt に合わせている。画面の文言を変えたら、ここも直すこと。
+# Maestro の text は正規表現として「全体一致」で比べる。
+appId: dev.lifeos.pendant
+name: anam 全画面ツアー
+---
+- launchApp
+# 起動アニメーション（約 2 秒）のあと、下のタブが出る
+- extendedWaitUntil:
+    visible: "ホーム"
+    timeout: 15000
+- waitForAnimationToEnd
+
+# ---- ホーム ----
+- assertVisible: "今日のハイライト"
+- takeScreenshot: out/shots/01-home
+
+# ---- 要約: 文字で相談 → 報告書 ----
+# 「要約」はログ画面の絞り込みボタンにもあるので、ホームにいるうちに押す
+- tapOn: "要約"
+- assertVisible: "押して話す"
+- tapOn: "文字で入力する"
+- tapOn: "何を伝えるべき？"
+# サーバー接続時は Gemini の返答待ち（数秒）。「聞いています…」が消えるまで待つ
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    notVisible: "聞いています…"
+    timeout: 45000
+- waitForAnimationToEnd
+- takeScreenshot: out/shots/02-summary-answer
+- tapOn: "医師向け報告書にまとめる"
+- waitForAnimationToEnd
+- takeScreenshot: out/shots/03-report
+- tapOn: "閉じる"
+
+# ---- ログ: 文字起こし / 生データ ----
+- tapOn: "ログ"
+- waitForAnimationToEnd
+- takeScreenshot: out/shots/04-logs
+- tapOn: "生データ"
+- waitForAnimationToEnd
+- tapOn: "文字起こし"
+- scrollUntilVisible:
+    element:
+      text: "11/8.*"
+    direction: DOWN
+    timeout: 10000
+    optional: true
+
+# ---- 診療: Gemini で作り直す（クラウド送信オフ・未接続ならボタンは押せない／無いので飛ばす） ----
+- tapOn: "診療"
+- waitForAnimationToEnd
+- tapOn:
+    text: "記録から作り直す（Gemini）"
+    optional: true
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    notVisible: "Gemini で作成中…"
+    timeout: 45000
+- takeScreenshot: out/shots/05-clinic
+
+# ---- 設定 ----
+- tapOn: "設定"
+- waitForAnimationToEnd
+- assertVisible: "クラウドに送信する"
+- takeScreenshot: out/shots/06-settings

@@ -47,17 +47,24 @@ adb shell am force-stop "$APP"   # 起動アニメーションから撮る
 opts=(--record "$OUT" --max-size 1280)
 # scrcpy 2.0 以降は音声も録ろうとするので止める（1.x にはこのオプションがない）
 [ "$(scrcpy --version | head -1 | grep -oE '[0-9]+' | head -1)" -ge 2 ] && opts+=(--no-audio)
+# ウィンドウは出さない。出すと、画面の無い環境（エージェントからの実行など）で固まり、止める合図も受け取らない
+scrcpy --help 2>&1 | grep -q -- '--no-window' && opts+=(--no-window)
 scrcpy "${opts[@]}" >out/scrcpy.log 2>&1 &
 REC=$!
-stop_rec() { kill -INT "$REC" 2>/dev/null && wait "$REC" 2>/dev/null || true; }
+# スクリプト内でバックグラウンドにしたプロセスは SIGINT を無視するので TERM で止める（scrcpy は TERM でも mp4 を閉じる）
+stop_rec() { kill -TERM "$REC" 2>/dev/null && wait "$REC" 2>/dev/null || true; }
 trap stop_rec EXIT
 sleep 3   # scrcpy の録画開始待ち
 
+rm -f out/shots/*.png
+touch out/.start   # これより新しいスクリーンショットだけを集める
 status=0
 maestro test "$FLOW" || status=$?
 sleep 2   # 最後の画面を少し映す
 stop_rec
 trap - EXIT
+# Maestro 2.x は takeScreenshot を ~/.maestro/tests/<実行日時>/ の下に保存するので、out/shots に集める
+find "$HOME/.maestro/tests" -newer out/.start -path '*takeScreenshot*' -name '*.png' -exec cp {} out/shots/ \; 2>/dev/null || true
 
 [ -s "$OUT" ] || die "録画ファイルが作られませんでした（out/scrcpy.log を確認）"
 echo "録画: $(pwd)/$OUT"

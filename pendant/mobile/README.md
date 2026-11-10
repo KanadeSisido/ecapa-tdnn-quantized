@@ -18,6 +18,8 @@ URL とトークンは Git に入れない。未設定ならアプリは固定�
 
 Gemini に送るかどうかは、設定タブの「クラウドに送信する」（`PATCH /settings`）でサーバーが判定する。
 
+画面を自動操作して録画する（デモ動画）: [demo/README.md](demo/README.md)
+
 ## 構成と責任の境界
 
 | shared（commonMain） | platform |

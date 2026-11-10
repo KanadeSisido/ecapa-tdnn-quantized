@@ -29,6 +29,13 @@ prop() { sed -n "s/^$1=//p" ../local.properties 2>/dev/null | tail -1 | tr -d '\
 BASE="$(prop pendant.api.base)"; TOKEN="$(prop pendant.api.token)"
 if [ -n "$BASE" ] && [ -n "$TOKEN" ]; then
   auth=(-H "Authorization: Bearer $TOKEN")
+  # 声の相談の API があるか（空の音声を送ると、あれば 400、古いサーバーなら 404）。録画には使わないので警告だけ
+  code=$(curl -s -o /dev/null -w '%{http_code}' -m 30 "${auth[@]}" -X POST -H "Content-Type: audio/wav" "${BASE%/}/assistant/voice" || true)
+  case "$code" in
+    400) echo "サーバー: 声の相談 API あり" ;;
+    401) die "サーバーがトークンを受け付けません（local.properties の pendant.api.token を確認）" ;;
+    404) echo "警告: サーバーに声の相談 API がありません（server/ を再デプロイすると使える）" >&2 ;;
+  esac
   if curl -fsS -m 30 "${auth[@]}" -X PATCH -H "Content-Type: application/json" \
        -d '{"cloud_enabled": true}' "${BASE%/}/settings" >/dev/null; then
     curl -fsS -m 30 "${auth[@]}" -X DELETE "${BASE%/}/assistant/messages" >/dev/null || true

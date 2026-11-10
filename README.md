@@ -38,13 +38,13 @@ DevFest GDGoC Japan Hackathon 2026 の提出物。
 
 | パス | 内容 |
 |---|---|
-| `pendant/mobile/` | アプリ（Android: Kotlin / Compose、iOS: SwiftUI、共通の同期ロジック: Kotlin Multiplatform）。[README](pendant/mobile/README.md) |
+| `pendant/mobile/` | アプリ（Android: Kotlin / Compose、iOS: SwiftUI、共通の同期ロジック: Kotlin Multiplatform）。[README](pendant/mobile/README.md)、画面の自動録画は [demo/](pendant/mobile/demo/README.md) |
 | `pendant/fw/` | ペンダントのファームウェア（nRF54L15、Zephyr / NCS） |
 | `pendant/hw/` | ペンダントの基板（KiCad）。Standard（CR2477）と Premium（Solar＋蓄電） |
 | `pendant/docs/spec/` | ペンダントの仕様（電源・音声・保存・同期形式・RF・筐体など） |
 | `pendant/brand/` | ロゴ（SVG）とアプリアイコン |
 | `export/`、`app/`、`report/` | 話者照合（ECAPA-TDNN を INT8 化してスマホで動かす）の PoC。[下記](#話者照合-pocecapa-tdnn) |
-| `server/`（**`server` ブランチ**） | pendant-api。API 仕様は `server/API.md`、デプロイは `server/deploy.sh` |
+| `server/` | pendant-api。API 仕様は `server/API.md`、デプロイは `server/deploy.sh` |
 
 ## アプリを動かす
 

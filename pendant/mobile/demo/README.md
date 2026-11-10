@@ -45,6 +45,23 @@ Linux か macOS。Android Studio は不要。
 
 `adb devices` で端末が 1 台だけ `device` と出れば準備完了。
 
+## デモの前に確認すること
+
+サーバー（Cloud Run）は**再起動・再デプロイのたびにデモデータに戻り、クラウド送信がオフになる**。
+`record.sh` は録画の前に次を自動で行うが、人がアプリを操作してデモするときは自分で確認する。
+
+```bash
+U=https://pendant-api-756406909128.asia-northeast1.run.app
+H="Authorization: Bearer <トークン>"
+curl -s $U/health                                   # {"status":"ok"}（止まっていたら数秒かかる）
+curl -s -H "$H" $U/settings                         # cloud_enabled が false ならオンにする ↓
+curl -s -X PATCH -H "$H" -H "Content-Type: application/json" -d '{"cloud_enabled": true}' $U/settings
+curl -s -X DELETE -H "$H" $U/assistant/messages     # 相談の履歴を消す（任意）
+```
+
+アプリの設定タブで「クラウドに送信する」をオンにしてもよい（確認ダイアログが出る）。
+声の相談（「押して話す」）は、クラウド送信がオンのときだけ使える。
+
 ## 録画する
 
 ```bash
